@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The "Find Your Country" Quiz — Kairos Destinara</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Abhaya+Libre:wght@400;500;600;700;800&family=Jim+Nightshade&family=Sacramento&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-size:16px}
+body{font-family:'Abhaya Libre',Georgia,serif;background:#FAFAF8;color:#4A4A4A;min-height:100vh;overflow-x:hidden}
+
+/* ── SHELL ── */
+.shell{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#FAFAF8;position:relative}
+
+/* ── STICKY HEADER ── */
+.sticky-hd{position:sticky;top:0;z-index:100;background:#2C2C2C;padding:11px 22px 0;flex-shrink:0}
+.hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hd-cat{font-family:'Abhaya Libre',sans-serif;font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#8BA89A}
+.hd-count{font-family:'Sacramento',cursive;font-size:18px;color:rgba(255,255,255,0.45);line-height:1}
+.progress-track{height:4px;background:rgba(255,255,255,0.08);overflow:hidden}
+.progress-fill{height:4px;background:#8BA89A;transition:width 0.4s ease}
+/* dot map */
+.dot-map{display:flex;gap:4px;padding:10px 0 11px;justify-content:center;flex-wrap:wrap;align-items:center}
+.dot-gap{width:8px}
+.dot{height:7px;border-radius:4px;background:rgba(255,255,255,0.1);transition:all 0.3s ease;flex-shrink:0}
+.dot.done{background:#4A7A65}
+.dot.active{background:#8BA89A;width:18px}
+.dot.pending{width:7px}
+
+/* ── SCREENS ── */
+.screen{display:none;flex-direction:column;flex:1}
+.screen.active{display:flex}
+
+/* ── COVER ── */
+.cover-hero{background:#8BA89A;padding:32px 28px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:13px}
+.cover-brand-row{display:flex;align-items:center;gap:10px}
+.brand-logo{width:62px;height:62px;object-fit:contain;mix-blend-mode:multiply;flex-shrink:0}
+.brand-script{font-family:'Sacramento',cursive;font-size:30px;color:#FFFFFF;line-height:1}
+.brand-sub{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.65)}
+.cover-niche{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#2C2C2C}
+.cover-title{font-family:'Jim Nightshade',cursive;font-size:38px;color:#FFFFFF;line-height:1.1;max-width:320px}
+.cover-desc{font-family:'Abhaya Libre',serif;font-style:italic;font-size:13px;color:rgba(255,255,255,0.88);line-height:1.68;max-width:300px}
+.cover-div{width:36px;height:1px;background:rgba(255,255,255,0.28)}
+.cover-stats{display:flex;gap:22px;align-items:center}
+.stat-n{font-family:'Sacramento',cursive;font-size:32px;color:#2C2C2C;line-height:1}
+.stat-l{font-family:'Abhaya Libre',sans-serif;font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#2C2C2C;opacity:0.7;text-align:center}
+.stat-sep{width:1px;height:32px;background:rgba(255,255,255,0.2)}
+.cover-white{background:#FFFFFF;padding:16px 28px 14px;flex-shrink:0}
+.cover-how-lbl{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#7A8A80;margin-bottom:7px}
+.cover-how-row{font-family:'Abhaya Libre',sans-serif;font-size:11.5px;color:#2C2C2C;line-height:1.9}
+.cover-cta{background:#EEF2EF;padding:18px 28px 24px;flex-shrink:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.it{font-family:'Abhaya Libre',serif;font-style:italic;font-size:13px;color:#bb9c9e;border-left:2px solid #C8A97E;padding-left:11px;text-align:left;line-height:1.68}
+.btnd{font-family:'Abhaya Libre',sans-serif;font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#FFFFFF;background:#2C2C2C;padding:13px 28px;border:1px solid #2C2C2C;cursor:pointer;transition:all .3s;display:inline-block;text-decoration:none;border-radius:0}
+.btnd:hover{background:transparent;color:#2C2C2C}
+
+/* ── CATEGORY INTRO ── */
+.cat-intro{background:#8BA89A;padding:36px 28px 30px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;flex:1}
+.cat-num{font-family:'Sacramento',cursive;font-size:48px;color:rgba(255,255,255,0.25);line-height:1}
+.cat-name{font-family:'Jim Nightshade',cursive;font-size:34px;color:#FFFFFF;line-height:1.1}
+.cat-desc{font-family:'Abhaya Libre',serif;font-style:italic;font-size:13.5px;color:rgba(255,255,255,0.88);line-height:1.68;max-width:280px}
+.cat-qs-label{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5)}
+.cat-cta-wrap{background:#FAFAF8;padding:16px 28px 20px;flex-shrink:0;text-align:center}
+.cat-cta-hint{font-family:'Abhaya Libre',sans-serif;font-size:11px;color:#7A8A80;margin-bottom:12px;letter-spacing:0.5px}
+
+/* ── QUESTION SCREENS ── */
+.ph{background:#8BA89A;padding:14px 28px 12px;flex-shrink:0}
+.pl{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:3px}
+.pt{font-family:'Abhaya Libre',serif;font-weight:400;font-size:18px;color:#FFFFFF;line-height:1.25}
+.pt em{font-style:italic}
+.pbsc{flex:1;padding:12px 22px 12px;display:flex;flex-direction:column;gap:7px;background:#FFFFFF;overflow-y:auto}
+.q-helper{font-family:'Abhaya Libre',serif;font-style:italic;font-size:12px;color:#bb9c9e;border-left:2px solid #C8A97E;padding-left:10px;margin-bottom:5px;line-height:1.6}
+.opt{padding:12px 15px;border:1px solid rgba(0,0,0,0.08);background:#FFFFFF;cursor:pointer;transition:all .18s;display:flex;align-items:flex-start;gap:10px;border-radius:0}
+.opt:hover{border-color:#8BA89A;background:#EEF2EF}
+.opt.selected{border-color:#8BA89A;background:#EEF2EF;border-width:1.5px}
+.opt-label{font-family:'Abhaya Libre',sans-serif;font-size:13.5px;color:#2C2C2C;line-height:1.45;font-weight:500}
+.opt-check{width:15px;height:15px;border:1px solid rgba(0,0,0,0.18);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .18s;border-radius:0}
+.opt.selected .opt-check{background:#8BA89A;border-color:#8BA89A}
+.opt.selected .opt-check::after{content:'';display:block;width:7px;height:4px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translateY(-1px)}
+
+/* Question nav footer */
+.q-foot{background:#2C2C2C;padding:11px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.nb{font-family:'Abhaya Libre',sans-serif;font-weight:600;font-size:9px;padding:9px 18px;border:1px solid rgba(255,255,255,0.18);cursor:pointer;transition:all .15s;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.45);background:transparent;border-radius:0}
+.nb:hover{color:#FFFFFF;border-color:rgba(255,255,255,0.5)}
+.nb.nx{background:#8BA89A;color:#FFFFFF;border-color:#8BA89A}
+.nb.nx:hover{background:#6E8E7E;border-color:#6E8E7E}
+.nb:disabled{opacity:.2;cursor:default;pointer-events:none}
+
+/* slide transition */
+.slide-wrap{display:flex;flex-direction:column;flex:1;transition:opacity 0.22s ease,transform 0.22s ease}
+.slide-wrap.out-left{opacity:0;transform:translateX(-32px)}
+.slide-wrap.out-right{opacity:0;transform:translateX(32px)}
+
+/* ── RESULTS ── */
+.results-hero{background:#8BA89A;padding:28px 28px 22px;flex-shrink:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.results-label{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.6)}
+.results-title{font-family:'Jim Nightshade',cursive;font-size:36px;color:#FFFFFF;line-height:1.1}
+.results-sub{font-family:'Abhaya Libre',serif;font-style:italic;font-size:13px;color:rgba(255,255,255,0.88);line-height:1.65;max-width:300px}
+.results-body{flex:1;padding:14px 22px 20px;display:flex;flex-direction:column;gap:12px;background:#FAFAF8;overflow-y:auto}
+.intro-card{background:#FFFFFF;border:1px solid rgba(0,0,0,0.06);padding:14px 16px}
+.intro-card-lbl{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#7A8A80;margin-bottom:5px}
+.intro-card-text{font-family:'Abhaya Libre',serif;font-style:italic;font-size:13px;color:#4A4A4A;line-height:1.68}
+
+/* Country card */
+.c-card{border:1px solid rgba(0,0,0,0.08);background:#FFFFFF;overflow:hidden}
+.c-card.top{border-color:#8BA89A;border-width:1.5px}
+.c-head{padding:11px 16px;display:flex;align-items:center;gap:10px}
+.c-head.r1{background:#8BA89A}
+.c-head.r2{background:#6E8E7E}
+.c-head.r3{background:#4A7A65}
+.c-flag{font-size:20px;line-height:1}
+.c-name{font-family:'Abhaya Libre',serif;font-weight:600;font-size:16px;color:#FFFFFF;flex:1}
+.c-rank{font-family:'Sacramento',cursive;font-size:24px;color:rgba(255,255,255,0.6);line-height:1}
+.c-body{padding:13px 16px;display:flex;flex-direction:column;gap:9px}
+.c-lbl{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#7A8A80}
+.c-why{font-family:'Abhaya Libre',serif;font-size:13px;color:#4A4A4A;line-height:1.65}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-family:'Abhaya Libre',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;background:#EEF2EF;color:#7A8A80;border:1px solid rgba(0,0,0,0.06);border-radius:0}
+
+/* Category bar */
+.cat-bar-row{display:flex;flex-direction:column;gap:4px}
+.cat-bar-top{display:flex;justify-content:space-between;align-items:baseline}
+.cat-bar-name{font-family:'Abhaya Libre',sans-serif;font-size:12px;font-weight:600;color:#2C2C2C}
+.cat-bar-val{font-family:'Sacramento',cursive;font-size:16px;color:#8BA89A;line-height:1}
+.cat-bar-track{height:5px;background:rgba(0,0,0,0.06);overflow:hidden}
+.cat-bar-fill{height:5px;background:#8BA89A;transition:width 0.6s ease}
+
+/* Neighborhood section */
+.nbhd-section{border-top:1px solid rgba(0,0,0,0.06);padding-top:9px}
+.nbhd-lbl{font-family:'Abhaya Libre',sans-serif;font-size:8px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#C8A97E;margin-bottom:6px}
+.nbhd-item{margin-bottom:7px}
+.nbhd-name{font-family:'Abhaya Libre',serif;font-weight:600;font-size:13px;color:#2C2C2C}
+.nbhd-vibe{font-family:'Abhaya Libre',serif;font-style:italic;font-size:12px;color:#bb9c9e;line-height:1.5}
+
+/* CTA */
+.cta-block{background:#8BA89A;padding:22px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0}
+.cta-block2{background:#2C2C2C;padding:20px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0}
+.cta-block2 .cta-title{color:#FFFFFF}
+.cta-block2 .cta-text{color:rgba(255,255,255,0.7)}
+.btn-dl{font-family:'Abhaya Libre',sans-serif;font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#8BA89A;background:transparent;padding:11px 24px;border:1px solid #8BA89A;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:8px;border-radius:0}
+.btn-dl:hover{background:#8BA89A;color:#FFFFFF}
+.btn-dl svg{flex-shrink:0}
+.cta-title{font-family:'Jim Nightshade',cursive;font-size:28px;color:#FFFFFF;line-height:1.2}
+.cta-text{font-family:'Abhaya Libre',serif;font-style:italic;font-size:12.5px;color:rgba(255,255,255,0.88);line-height:1.65;max-width:300px}
+.btnw{font-family:'Abhaya Libre',sans-serif;font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:#2C2C2C;background:#FFFFFF;padding:13px 28px;border:1px solid #FFFFFF;cursor:pointer;transition:all .3s;display:inline-block;text-decoration:none;border-radius:0}
+.btnw:hover{background:transparent;color:#FFFFFF}
+.retake-link{font-family:'Abhaya Libre',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);cursor:pointer;text-decoration:underline;text-underline-offset:3px;background:none;border:none}
+.retake-link:hover{color:rgba(255,255,255,0.85)}
+.closing{background:#FFFFFF;padding:14px 28px 18px;text-align:center;flex-shrink:0}
+.closing-text{font-family:'Abhaya Libre',serif;font-style:italic;font-size:13px;color:#bb9c9e;line-height:1.65}
+
+@media(max-width:520px){
+  .pbsc{padding:11px 16px 11px}
+  .ph{padding:11px 18px 9px}
+  .cover-hero{padding:24px 20px 20px;gap:10px}
+  .results-body{padding:12px 16px 18px}
+  .c-body,.results-hero{padding:14px 16px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ════════════════════════════════════
+     STICKY HEADER (hidden on cover + cat intros)
+════════════════════════════════════ -->
+<div class="sticky-hd" id="sticky-hd" style="display:none">
+  <div class="hd-row">
+    <span class="hd-cat" id="hd-cat-label">Let's talk vibes</span>
+    <span class="hd-count" id="hd-count">1</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  <div class="dot-map" id="dot-map"></div>
+</div>
+
+<!-- ════════════════════════════════════
+     COVER
+════════════════════════════════════ -->
+<div class="screen active" id="screen-cover">
+  <div class="cover-hero">
+    <div class="cover-brand-row">
+      <img class="brand-logo" src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAIKAh4DASIAAhEBAxEB/8QAHAABAAMBAQEBAQAAAAAAAAAAAAUGBwQDAgEI/8QASxAAAQMDAgMFBQUDCgMIAgMAAQACAwQFEQYhEjFBBxMiUWEUMnGBkSNCUqGxFcHRCBYkMzZicnSy4UOz8BclN0RTc4KSNcJjZPH/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAQIDBAX/xAAyEQEBAAIBAwICCgICAwEBAAAAAQIRAxIhMUFRBHETImGBkaGxwdHwMuEj8RRCUgVi/9oADAMBAAIRAxEAPwD+y0REBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERARcdbdbZRP4KuvpoHeT5ACumCaKoibLBKyWNwy1zHZB+aI2+0RESIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICrF+1jR2y6CgbH3zmnEzg7AYcZwrOsW1o/2DUlcZgQwyuc4+YO+T5DGFbGbZcudxnZKVdXBWVE8vAzD5HcTQM7r6oDJQF0lurZqQuPE4NdlhPq07KnWm+U81eIXQuiDmj7TOWF3Q59Rtn0VjfUtDmAYOXcIweuD/AAWvasZlL3Xqwan76RtHdRHFO44jmZ/Vyen90+is6yB5bKwxuHEx3TplXjs6uM9XaH0lU8vmpH8HE45LmfdJ/RZ5Y67tsM++qs6Iio1EXkyohfVPpmvBljaHOHkDyXqgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIi5562lhqoaWWdjZps92wnd2FGWUx72pkt8OhERSgREQEREBERAREQF41dVT0kXe1MzImebjhQmrdTQ2VrIIWsnrHnPdk7Mb5ux+QWf3e51ldIaurmLnnYN6NB5AeSvjjtlnyzHs0Kt1LC1maKB1QSNnO8I/iodut5RMWPpom4O/vLPbnW1z6ciOoOQMhvFnCgW3SWfLKhr4ntdh+5BHy8ir9OMYZfEX0bjS6xoZJOGaMtH4mHi/JUbt2no5bPHdrXOyWpawsnjbzfHnbI8wf1KrXtToIGzd6XNOSOHf8AReX7Zgqy5krmzxuH2kR5kcsp0xF5urHVZ/8AzgnqZS0cAY0bNcCHN+fm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" alt="Kairos Destinara logo"/>
+      <div style="text-align:left">
+        <div class="brand-script">Kairos Destinara</div>
+        <div class="brand-sub">by Creativa Mari</div>
+      </div>
+    </div>
+    <div class="cover-niche">Solo travel · Moving abroad · Building freedom</div>
+    <div class="cover-title"><span style="font-family:'Abhaya Libre',serif;font-size:19px;font-weight:600;display:block;letter-spacing:1px">The</span>Find your country<span style="font-family:'Abhaya Libre',serif;font-size:19px;font-weight:600;display:block;letter-spacing:1px">quiz.</span></div>
+    <div class="cover-desc">Because the right answer was never one size fits all. It was always yours.</div>
+    <div class="cover-div"></div>
+    <div class="cover-stats">
+      <div style="text-align:center"><div class="stat-n">25</div><div class="stat-l">Questions</div></div>
+      <div class="stat-sep"></div>
+      <div style="text-align:center"><div class="stat-n">5</div><div class="stat-l">Categories</div></div>
+      <div class="stat-sep"></div>
+      <div style="text-align:center"><div class="stat-n">3</div><div class="stat-l">Top matches</div></div>
+    </div>
+    <div class="cover-div"></div>
+  </div>
+  <div class="cover-white">
+    <div class="cover-how-lbl">What you will discover</div>
+    <div class="cover-how-row">Your top 3 country matches, ranked by how closely they fit your lifestyle, your budget, your energy, and what you actually need.</div>
+    <div class="cover-how-row" style="margin-top:4px">Plus the neighborhoods inside each country that match your specific vibe.</div>
+  </div>
+  <div class="cover-cta">
+    <div class="it">You already know something needs to change. This is where the clarity starts.</div>
+    <button class="btnd" onclick="startQuiz()">Start the quiz</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     QUESTION SCREENS (built by JS)
+════════════════════════════════════ -->
+<div class="screen" id="screen-quiz">
+  <!-- cat intro -->
+  <div id="cat-intro-wrap" class="screen active" style="display:none;flex-direction:column;flex:1">
+    <div class="cat-intro" id="cat-intro-body">
+      <div class="cat-num" id="ci-num">01</div>
+      <div class="cat-name" id="ci-name">Let's talk vibes</div>
+      <div class="cat-desc" id="ci-desc">The environment you land in shapes everything. Let's find yours.</div>
+      <div class="cover-div"></div>
+      <div class="cat-qs-label" id="ci-qs">5 questions in this section</div>
+    </div>
+    <div class="cat-cta-wrap">
+      <div class="cat-cta-hint">Answer honestly, not aspirationally.</div>
+      <button class="btnd" onclick="startCategory()">Let's go</button>
+    </div>
+  </div>
+
+  <!-- question -->
+  <div id="question-wrap" style="display:none;flex-direction:column;flex:1">
+    <div class="slide-wrap" id="slide-wrap">
+      <div class="ph">
+        <div class="pl" id="q-pl">Section 1 · Question 1 of 5</div>
+        <div class="pt" id="q-pt">Question text</div>
+      </div>
+      <div class="pbsc" id="q-opts"></div>
+    </div>
+    <div class="q-foot">
+      <button class="nb" id="btn-back" onclick="goBack()">Back</button>
+      <button class="nb nx" id="btn-next" onclick="goNext()" disabled>Next</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     RESULTS
+════════════════════════════════════ -->
+<div class="screen" id="screen-results">
+  <div class="results-hero">
+    <div class="results-label">Your matches</div>
+    <div class="results-title">Here is where you belong.</div>
+    <div class="results-sub" id="results-sub">Loading your results...</div>
+  </div>
+  <div class="results-body">
+    <div class="intro-card">
+      <div class="intro-card-lbl">Based on your answers</div>
+      <div class="intro-card-text" id="result-intro-text">...</div>
+    </div>
+    <div id="country-list"></div>
+    <div class="cta-block">
+      <div class="cta-title">You have a starting point.</div>
+      <div class="cta-text">The full bundle walks you through what comes next, including budgeting, the readiness checklist, the first 30 days, and how to fund the life you are building.</div>
+      <button class="btnw">Get the full bundle</button>
+      <button class="retake-link" onclick="retake()">Retake the quiz</button>
+    </div>
+    <div class="cta-block2">
+      <div class="cta-title" style="font-family:'Jim Nightshade',cursive;font-size:24px;line-height:1.2">Save your results</div>
+      <div class="cta-text" style="font-family:'Abhaya Libre',serif;font-style:italic;font-size:12.5px;line-height:1.65;max-width:280px">Download a copy of your matches to keep, share, or come back to whenever you need a reminder of where you are headed.</div>
+      <button class="btn-dl" onclick="downloadResults()">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 1v7.5M6.5 8.5L4 6M6.5 8.5L9 6M1.5 10.5h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download my results (.txt)
+      </button>
+    </div>
+    <div class="closing">
+      <div class="closing-text">The right country was never the hard part. The hard part was deciding to stop waiting for the perfect moment and start.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .shell -->
+
+<script>
+// ════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════
+const CATEGORIES = [
+  {
+    id: "vibes",
+    name: "Let's talk vibes",
+    num: "01",
+    desc: "The environment you land in shapes everything, from your mood to your social life to how you work. Let's figure out yours.",
+    questions: [
+      { text: "When you close your eyes and imagine your ideal morning, where are you?", helper: "Not the Instagram version. The one that actually makes you exhale.", options: [
+        { label: "On a terrace with coffee, watching a city wake up", val: "city" },
+        { label: "By the sea, with sand nearby and nowhere to rush", val: "beach" },
+        { label: "Surrounded by green, with mountains or forest in the distance", val: "mountain" },
+        { label: "Somewhere warm, with markets and local life outside my door", val: "culture_rich" },
+      ]},
+      { text: "What kind of energy do you need from the place you live?", helper: "This is about what sustains you long term, not just what excites you for a week.", options: [
+        { label: "Buzz, options, things happening, a city that keeps moving", val: "city" },
+        { label: "Calm, slowness, nature close by, a pace I can actually breathe in", val: "mountain" },
+        { label: "A mix, city close but nature accessible, the best of both", val: "mix" },
+        { label: "Warmth, colour, outdoor living, a culture that spills into the streets", val: "culture_rich" },
+      ]},
+      { text: "How do you feel about heat and sun?", helper: "Weather affects your mood more than you think. Be honest.", options: [
+        { label: "I need warmth and sun for the majority of the year", val: "beach" },
+        { label: "I like seasons, including a real winter", val: "mountain" },
+        { label: "Warm but not too hot, Mediterranean is the sweet spot", val: "culture_rich" },
+        { label: "I can adapt, climate is not a dealbreaker for me", val: "mix" },
+      ]},
+      { text: "Which setting makes you feel most creative and alive?", options: [
+        { label: "A rooftop cafe in a city I am still discovering", val: "city" },
+        { label: "A beach bar with my laptop, the sound of waves in the background", val: "beach" },
+        { label: "A cosy mountain town cafe, slow and quiet", val: "mountain" },
+        { label: "A neighbourhood market, colour and chaos and real life", val: "culture_rich" },
+      ]},
+      { text: "When you think about your ideal neighbourhood, what comes first?", helper: "The area around you matters more than the country name.", options: [
+        { label: "Walkable streets with cafes, food, life within reach", val: "city" },
+        { label: "Green, open space, houses rather than apartments, quiet", val: "mountain" },
+        { label: "Close to the sea or the beach, that is non-negotiable", val: "beach" },
+        { label: "A neighbourhood with character, local shops, not a tourist zone", val: "culture_rich" },
+      ]},
+    ]
+  },
+  {
+    id: "size",
+    name: "Let's talk scale",
+    num: "02",
+    desc: "Country size and geography shape how free you feel. Small island, large continent, or somewhere with easy borders to cross.",
+    questions: [
+      { text: "How do you feel about being on an island?", helper: "Islands are beautiful. They are also finite. Think about that before you answer.", options: [
+        { label: "I love it. The sea around me is a feature, not a limitation", val: "island" },
+        { label: "Short stays yes, long term it would feel too small", val: "mainland" },
+        { label: "Only if it is large enough to feel like a real country", val: "large" },
+        { label: "I have not thought about it much either way", val: "mix" },
+      ]},
+      { text: "How important is it to be able to road trip within your base country?", options: [
+        { label: "Very. I want a whole country to explore without needing a flight", val: "large" },
+        { label: "Nice to have, but quick flights are fine too", val: "mix" },
+        { label: "I prefer being close to multiple borders so I can hop", val: "eu_access" },
+        { label: "Not important. I will explore within a small radius and that is enough", val: "island" },
+      ]},
+      { text: "What is your relationship with easy travel to other countries?", helper: "Some people want roots. Others want access. This question is about which matters more.", options: [
+        { label: "Essential. I want to be somewhere I can reach three countries in a weekend", val: "eu_access" },
+        { label: "Nice, but I am committing to one place so I do not need it constantly", val: "large" },
+        { label: "I want the option but I am not a frequent traveller", val: "mix" },
+        { label: "I would rather go deeper in one country than spread thin", val: "island" },
+      ]},
+      { text: "How do you feel about living in a country where the capital is very different from the rest?", options: [
+        { label: "I like that, it means there is variety in one country", val: "large" },
+        { label: "I want everywhere to feel coherent, one vibe, one culture", val: "island" },
+        { label: "I will base myself somewhere specific so the capital does not matter", val: "mix" },
+        { label: "I want to be in a hub city anyway so the rest is not relevant", val: "city" },
+      ]},
+      { text: "If you had to describe your ideal location in one phrase, which is closest?", options: [
+        { label: "A small country with a big personality", val: "island" },
+        { label: "A large country with enough space to disappear and reappear", val: "large" },
+        { label: "A strategic base that puts me close to everywhere", val: "eu_access" },
+        { label: "Wherever feels right when I get there", val: "mix" },
+      ]},
+    ]
+  },
+  {
+    id: "budget",
+    name: "Let's talk money",
+    num: "03",
+    desc: "No judgment here. The right country for your budget is a real match, not a compromise.",
+    questions: [
+      { text: "What is your honest relationship with cost of living right now?", helper: "Not what you are aiming for. Where you are.", options: [
+        { label: "I need my money to stretch as far as possible, every cent counts", val: "budget" },
+        { label: "Comfortable mid range, not rich but not watching every cent", val: "mid" },
+        { label: "I will pay more for quality, ease, and safety of life", val: "quality" },
+        { label: "I am not sure yet, I am still figuring out what I can afford", val: "mid" },
+      ]},
+      { text: "How do you feel about renting versus the local rental market?", options: [
+        { label: "I want cheap rent to be a given, that is the whole point", val: "budget" },
+        { label: "Fair market price is fine as long as I am getting value", val: "mid" },
+        { label: "I will pay premium for a good apartment in a good area", val: "quality" },
+        { label: "I have not thought about this yet", val: "mid" },
+      ]},
+      { text: "What is your relationship with eating out and daily spending?", options: [
+        { label: "I cook at home almost exclusively, eating out is rare", val: "budget" },
+        { label: "I want to eat well and cheaply, street food and local spots most days", val: "budget" },
+        { label: "A mix. Cook at home mostly, eat out a few times a week", val: "mid" },
+        { label: "I eat out often and I want good quality options nearby", val: "quality" },
+      ]},
+      { text: "How do you feel about building a financial buffer before you go?", helper: "This is not about whether you have it. It is about what the answer tells me about your stage.", options: [
+        { label: "I need a place where I can build the buffer while I am already there", val: "budget" },
+        { label: "I have some savings but I want my daily costs to be manageable", val: "mid" },
+        { label: "I have savings and I want to move somewhere without financial stress", val: "quality" },
+      ]},
+      { text: "What does financial freedom mean to you in this context?", options: [
+        { label: "Living on very little and having full time freedom", val: "budget" },
+        { label: "Covering my costs comfortably with room to save", val: "mid" },
+        { label: "Maintaining my lifestyle while also building something", val: "quality" },
+        { label: "Not stressing about money while I figure out the bigger picture", val: "mid" },
+      ]},
+    ]
+  },
+  {
+    id: "culture",
+    name: "Let's talk culture",
+    num: "04",
+    desc: "Culture is the invisible thing you live inside every single day. Getting this right is not optional.",
+    questions: [
+      { text: "How much does it matter that the local culture is warm and outwardly social?", helper: "Some people thrive in open cultures. Others prefer the freedom of being left alone.", options: [
+        { label: "Very much. I want locals to be warm, social, easy to connect with", val: "social" },
+        { label: "I appreciate friendliness but I do not need to be embraced", val: "neutral" },
+        { label: "I actually prefer a culture that minds its own business", val: "private" },
+        { label: "I will mostly build community with other expats anyway", val: "expat" },
+      ]},
+      { text: "How important is a food culture that takes eating seriously?", options: [
+        { label: "Non negotiable. Food is a huge part of how I experience a place", val: "social" },
+        { label: "I enjoy good food but it is not a deciding factor", val: "neutral" },
+        { label: "I cook at home mostly, local food culture matters less to me", val: "private" },
+      ]},
+      { text: "How do you feel about being in a place with a strong expat or digital nomad community?", options: [
+        { label: "I want that. It makes building community much easier as a solo woman", val: "expat" },
+        { label: "Nice to have but I also want to integrate locally", val: "neutral" },
+        { label: "I want to go deep into the local culture, not an expat bubble", val: "social" },
+        { label: "I am an introvert, I will build a small circle regardless of who is there", val: "private" },
+      ]},
+      { text: "How important is it that the culture is open minded and progressive?", options: [
+        { label: "Very. I need to feel comfortable and accepted as who I am", val: "social" },
+        { label: "Somewhat. I want tolerance but full progressiveness is not required", val: "neutral" },
+        { label: "I mainly care about safety, not cultural values specifically", val: "private" },
+        { label: "I will form my own bubble so the wider culture matters less", val: "expat" },
+      ]},
+      { text: "What is your relationship with religion and tradition in the local culture?", helper: "This is about whether it affects your daily life, not whether you respect it.", options: [
+        { label: "I want a largely secular everyday environment", val: "neutral" },
+        { label: "A bit of tradition is fine, it adds character to a place", val: "social" },
+        { label: "I am comfortable adapting to whatever culture I am in", val: "private" },
+        { label: "I want something with strong cultural identity, markets, festivals, richness", val: "expat" },
+      ]},
+    ]
+  },
+  {
+    id: "lifestyle",
+    name: "Let's talk how you live",
+    num: "05",
+    desc: "This is the part most quizzes skip. How you actually spend your days matters more than which country sounds good.",
+    questions: [
+      { text: "What does your ideal daily rhythm look like?", helper: "Not the hustle version. The version you could live for six months straight.", options: [
+        { label: "Work from cafes, explore often, keep moving within the city", val: "nomad" },
+        { label: "One home base with occasional trips, routine matters to me", val: "base" },
+        { label: "Slow travel, one to three months per place, going deep", val: "slow" },
+        { label: "Full relocation, I want to truly live somewhere new", val: "expat" },
+      ]},
+      { text: "What is your biggest fear about doing this solo?", helper: "Say the thing out loud. Naming it helps me match you better.", options: [
+        { label: "Loneliness, not meeting people or building real connections", val: "lonely" },
+        { label: "Safety, being a woman alone in an unfamiliar place", val: "unsafe" },
+        { label: "Money, running out or not being financially stable", val: "money_fear" },
+        { label: "Losing purpose, not finding my people or my rhythm", val: "boredom" },
+      ]},
+      { text: "How important is English being widely spoken?", options: [
+        { label: "Essential. I need to communicate easily from day one", val: "english_must" },
+        { label: "Nice to have, but I am open to learning a new language", val: "english_nice" },
+        { label: "Does not matter. Full immersion is part of the appeal", val: "english_no" },
+      ]},
+      { text: "What kind of neighbourhood are you looking for within your city?", helper: "Zoom in from the country. What does your street actually look like?", options: [
+        { label: "Houses or smaller buildings, green space nearby, quieter energy", val: "base" },
+        { label: "An apartment in a walkable area with shops and cafes close", val: "nomad" },
+        { label: "A neighbourhood with character, local markets, not touristy", val: "slow" },
+        { label: "Close to other women doing similar things, community energy", val: "lonely" },
+      ]},
+      { text: "Where are you right now in this journey?", helper: "Be honest. Your results will be much more useful if they meet you where you actually are.", options: [
+        { label: "Still dreaming. I know I want this but have not taken any steps yet", val: "dreaming" },
+        { label: "Actively planning. Researching, saving, making it real", val: "planning" },
+        { label: "Almost ready. I need a final push and a clear direction", val: "ready" },
+        { label: "I am going. I just need to know where", val: "going" },
+      ]},
+    ]
+  },
+];
+
+// flatten questions
+const FLAT = [];
+CATEGORIES.forEach((cat, ci) => {
+  cat.questions.forEach((q, qi) => {
+    FLAT.push({ cat, catIndex: ci, qIndex: qi, isFirst: qi === 0, ...q });
+  });
+});
+const TOTAL = FLAT.length;
+
+// country data
+const COUNTRIES = [
+  {
+    name: "Portugal", flag: "🇵🇹",
+    tags: ["safe for women","english-friendly","affordable","great weather","expat community"],
+    scores: { city:2,beach:2,mountain:1,culture_rich:3,mix:3,mainland:3,large:2,eu_access:2,island:0,budget:2,mid:3,quality:2,social:3,neutral:3,private:2,expat:3,nomad:3,base:3,slow:3,lonely:3,unsafe:3,money_fear:2,boredom:2,english_must:3,english_nice:2,english_no:1,dreaming:2,planning:3,ready:3,going:3 }
+  },
+  {
+    name: "Spain", flag: "🇪🇸",
+    tags: ["excellent lifestyle","safe","social culture","EU access","beautiful cities"],
+    scores: { city:3,beach:2,mountain:2,culture_rich:3,mix:3,mainland:3,large:3,eu_access:3,island:0,budget:1,mid:3,quality:3,social:3,neutral:2,private:1,expat:2,nomad:2,base:3,slow:3,lonely:2,unsafe:3,money_fear:1,boredom:3,english_must:1,english_nice:3,english_no:2,dreaming:2,planning:3,ready:3,going:3 }
+  },
+  {
+    name: "Mexico", flag: "🇲🇽",
+    tags: ["vibrant culture","low cost","warm people","growing nomad scene","rich food scene"],
+    scores: { city:3,beach:2,mountain:1,culture_rich:3,mix:2,mainland:3,large:3,eu_access:0,island:0,budget:3,mid:2,quality:1,social:3,neutral:2,private:1,expat:3,nomad:3,base:2,slow:3,lonely:3,unsafe:1,money_fear:3,boredom:3,english_must:1,english_nice:2,english_no:3,dreaming:2,planning:2,ready:3,going:3 }
+  },
+  {
+    name: "Bali, Indonesia", flag: "🇮🇩",
+    tags: ["spiritual energy","beach and jungle","nomad hub","yoga culture","ultra affordable"],
+    scores: { city:1,beach:3,mountain:2,culture_rich:2,mix:2,mainland:1,large:1,eu_access:0,island:3,budget:3,mid:2,quality:1,social:2,neutral:2,private:2,expat:3,nomad:3,base:2,slow:3,lonely:2,unsafe:2,money_fear:3,boredom:2,english_must:2,english_nice:3,english_no:2,dreaming:3,planning:2,ready:2,going:3 }
+  },
+  {
+    name: "Colombia, Medellín", flag: "🇨🇴",
+    tags: ["eternal spring","affordable","growing expat scene","energetic city life","warm locals"],
+    scores: { city:3,beach:1,mountain:2,culture_rich:3,mix:2,mainland:3,large:2,eu_access:0,island:0,budget:3,mid:3,quality:1,social:3,neutral:2,private:1,expat:3,nomad:3,base:2,slow:2,lonely:3,unsafe:1,money_fear:3,boredom:3,english_must:1,english_nice:2,english_no:3,dreaming:2,planning:2,ready:3,going:3 }
+  },
+  {
+    name: "Thailand", flag: "🇹🇭",
+    tags: ["beach and city","ultra low cost","solo-travel friendly","amazing food","huge nomad scene"],
+    scores: { city:2,beach:3,mountain:2,culture_rich:2,mix:3,mainland:1,large:2,eu_access:0,island:2,budget:3,mid:3,quality:1,social:2,neutral:2,private:1,expat:3,nomad:3,base:2,slow:3,lonely:2,unsafe:2,money_fear:3,boredom:2,english_must:2,english_nice:3,english_no:2,dreaming:3,planning:2,ready:2,going:3 }
+  },
+  {
+    name: "Italy", flag: "🇮🇹",
+    tags: ["culture and beauty","excellent food","charming small towns","European lifestyle","slow living"],
+    scores: { city:2,beach:2,mountain:2,culture_rich:3,mix:3,mainland:3,large:3,eu_access:2,island:2,budget:1,mid:2,quality:3,social:3,neutral:2,private:2,expat:2,nomad:1,base:3,slow:3,lonely:1,unsafe:3,money_fear:1,boredom:3,english_must:1,english_nice:2,english_no:3,dreaming:3,planning:2,ready:2,going:2 }
+  },
+  {
+    name: "Georgia, Tbilisi", flag: "🇬🇪",
+    tags: ["visa-free long stays","very affordable","safe","unique culture","up and coming"],
+    scores: { city:3,beach:1,mountain:3,culture_rich:2,mix:2,mainland:2,large:2,eu_access:1,island:0,budget:3,mid:2,quality:1,social:2,neutral:2,private:2,expat:2,nomad:3,base:3,slow:3,lonely:2,unsafe:3,money_fear:3,boredom:2,english_must:1,english_nice:2,english_no:3,dreaming:3,planning:2,ready:2,going:3 }
+  },
+  {
+    name: "Netherlands", flag: "🇳🇱",
+    tags: ["English everywhere","private culture","EU access","cycling lifestyle","orderly and free"],
+    scores: { city:3,beach:1,mountain:0,culture_rich:2,mix:2,mainland:3,large:2,eu_access:3,island:0,budget:0,mid:2,quality:3,social:1,neutral:3,private:3,expat:3,nomad:2,base:3,slow:1,lonely:1,unsafe:3,money_fear:0,boredom:2,english_must:3,english_nice:3,english_no:1,dreaming:1,planning:3,ready:3,going:3 }
+  },
+];
+
+const NEIGHBORHOODS = {
+  "Portugal": [
+    { name: "Lisbon, Mouraria or Alfama", vibe: "For those who want culture, charm, and a slow morning espresso before the city wakes up." },
+    { name: "Porto, Foz do Douro", vibe: "Atlantic air, quieter pace, walkable to the beach and the old city." },
+    { name: "Algarve, Lagos or Tavira", vibe: "Beach life without the tourist trap. Real community, lower costs, longer seasons." },
+  ],
+  "Spain": [
+    { name: "Valencia, Ruzafa or El Cabanyal", vibe: "The city that has it all without the price tag of Madrid or Barcelona. Creative, warm, beach close." },
+    { name: "Seville, Triana", vibe: "Flamenco, tapas, whitewashed streets. The most authentically Spanish experience on the list." },
+    { name: "Malaga, El Soho", vibe: "New energy, old city, 320 days of sun, and a cost of living that still makes sense." },
+  ],
+  "Mexico": [
+    { name: "CDMX, Roma Norte or Condesa", vibe: "Tree-lined streets, incredible food, creative energy, a solo female traveler scene that already exists." },
+    { name: "Oaxaca, Centro or Jalatlaco", vibe: "Cobblestone streets, artisan culture, mezcal bars. Small enough to feel known." },
+    { name: "San Cristobal de las Casas", vibe: "Mountain air, colonial architecture, a tight expat community, and incredibly low cost." },
+  ],
+  "Bali, Indonesia": [
+    { name: "Canggu", vibe: "The global nomad hub. Cafes, co-working, surf, and a social scene that builds itself around you." },
+    { name: "Ubud", vibe: "Jungle, rice fields, yoga, and the kind of quiet that actually lets you think." },
+    { name: "Seminyak", vibe: "A bit more polished. Beach clubs, great restaurants, and a more settled expat feel." },
+  ],
+  "Colombia, Medellín": [
+    { name: "El Poblado", vibe: "The expat base. Safe, walkable, social. You will not be alone here for long." },
+    { name: "Laureles", vibe: "More local, less touristy. A quieter version of Medellin that still has everything." },
+    { name: "Envigado", vibe: "Just outside the city. Residential, cheap, and beloved by those who have actually stayed." },
+  ],
+  "Thailand": [
+    { name: "Chiang Mai, Nimman", vibe: "The original slow travel city. Cool climate, low cost, and a digital nomad community that actually stays." },
+    { name: "Bangkok, Ekkamai or Thonglor", vibe: "For those who want the city version of Thailand. Everything at your door, at a fraction of the cost." },
+    { name: "Koh Lanta", vibe: "Long-stay beach life. Less party, more quiet. The island for people who actually want to think." },
+  ],
+  "Italy": [
+    { name: "Bologna", vibe: "The city Italians actually choose to live in. University energy, extraordinary food, and none of the tourist chaos." },
+    { name: "Palermo, Sicily", vibe: "Raw, real, chaotic in the best way. Cheap, warm, and deeply underrated." },
+    { name: "Abruzzo region", vibe: "Mountains, coast, almost no foreigners. The Italy that still exists outside Instagram." },
+  ],
+  "Georgia, Tbilisi": [
+    { name: "Old Town, Abanotubani", vibe: "Sulphur baths, carved balconies, and a city that feels completely unlike anywhere else." },
+    { name: "Vera or Vake", vibe: "Quieter, residential, leafy. The neighbourhood you move to when you decide to actually stay." },
+    { name: "Kazbegi region", vibe: "The Caucasus mountains two hours away. A level of nature that resets you completely." },
+  ],
+  "Netherlands": [
+    { name: "Amsterdam, De Pijp or Jordaan", vibe: "Canal house vibes, world-class food scene, and a culture that genuinely does not care what you do with your life." },
+    { name: "Rotterdam, Kralingen", vibe: "Modern, international, more affordable than Amsterdam. A city that got rebuilt and made it interesting." },
+    { name: "Utrecht, Wittevrouwen", vibe: "Smaller, quieter, still connected. For the person who wants Amsterdam energy but not Amsterdam pace." },
+  ],
+};
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+let answers = {};
+let currentQ = 0;
+let phase = "cover"; // cover | cat-intro | question | results
+
+// ════════════════════════════════════════════════
+// DOT MAP
+// ════════════════════════════════════════════════
+function buildDots() {
+  const dm = document.getElementById('dot-map');
+  dm.innerHTML = '';
+  CATEGORIES.forEach((cat, ci) => {
+    cat.questions.forEach((_, qi) => {
+      const gi = FLAT.findIndex(f => f.catIndex === ci && f.qIndex === qi);
+      const d = document.createElement('div');
+      d.className = 'dot ' + (gi === currentQ ? 'active' : answers[gi] !== undefined ? 'done' : 'pending');
+      dm.appendChild(d);
+    });
+    if (ci < CATEGORIES.length - 1) {
+      const g = document.createElement('div');
+      g.className = 'dot-gap';
+      dm.appendChild(g);
+    }
+  });
+}
+
+function updateProgress() {
+  const pct = ((currentQ + 1) / TOTAL) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  const fq = FLAT[currentQ];
+  document.getElementById('hd-cat-label').textContent = fq.cat.name;
+  document.getElementById('hd-count').textContent = (currentQ + 1) + ' / ' + TOTAL;
+  buildDots();
+}
+
+// ════════════════════════════════════════════════
+// SCREENS
+// ════════════════════════════════════════════════
+function showScreen(id) {
+  ['cover','quiz','results'].forEach(s => {
+    const el = document.getElementById('screen-' + s);
+    el.classList.remove('active');
+    el.style.display = 'none';
+  });
+  const target = document.getElementById('screen-' + id);
+  target.style.display = 'flex';
+  target.classList.add('active');
+}
+
+function showCatIntro(catIndex) {
+  const cat = CATEGORIES[catIndex];
+  document.getElementById('ci-num').textContent = cat.num;
+  document.getElementById('ci-name').textContent = cat.name;
+  document.getElementById('ci-desc').textContent = cat.desc;
+  document.getElementById('ci-qs').textContent = cat.questions.length + ' questions in this section';
+  document.getElementById('cat-intro-wrap').style.display = 'flex';
+  document.getElementById('question-wrap').style.display = 'none';
+  document.getElementById('sticky-hd').style.display = 'none';
+  showScreen('quiz');
+}
+
+function showQuestion(qIndex, dir) {
+  const fq = FLAT[qIndex];
+  document.getElementById('cat-intro-wrap').style.display = 'none';
+  document.getElementById('question-wrap').style.display = 'flex';
+  document.getElementById('sticky-hd').style.display = 'block';
+  showScreen('quiz');
+
+  const sw = document.getElementById('slide-wrap');
+  const outClass = dir === 'fwd' ? 'out-right' : 'out-left';
+  sw.classList.add(outClass);
+  setTimeout(() => {
+    // update content
+    document.getElementById('q-pl').textContent = 'Section ' + (fq.catIndex + 1) + ' · Question ' + (fq.qIndex + 1) + ' of ' + fq.cat.questions.length;
+    document.getElementById('q-pt').innerHTML = fq.text;
+
+    const optsEl = document.getElementById('q-opts');
+    optsEl.innerHTML = '';
+    if (fq.helper) {
+      const h = document.createElement('div');
+      h.className = 'q-helper';
+      h.textContent = fq.helper;
+      optsEl.appendChild(h);
+    }
+    fq.options.forEach(opt => {
+      const el = document.createElement('div');
+      el.className = 'opt' + (answers[qIndex] === opt.val ? ' selected' : '');
+      el.innerHTML = `<div class="opt-check"></div><div class="opt-label">${opt.label}</div>`;
+      el.onclick = () => selectOpt(qIndex, opt.val);
+      optsEl.appendChild(el);
+    });
+
+    updateProgress();
+    updateNavBtns();
+    sw.classList.remove(outClass);
+  }, 220);
+}
+
+// ════════════════════════════════════════════════
+// INTERACTIONS
+// ════════════════════════════════════════════════
+function startQuiz() {
+  showCatIntro(0);
+}
+
+function startCategory() {
+  showQuestion(currentQ, 'fwd');
+}
+
+function selectOpt(qIndex, val) {
+  answers[qIndex] = val;
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  updateNavBtns();
+  buildDots();
+}
+
+function updateNavBtns() {
+  const btnNext = document.getElementById('btn-next');
+  const btnBack = document.getElementById('btn-back');
+  btnNext.disabled = answers[currentQ] === undefined;
+  btnNext.textContent = currentQ === TOTAL - 1 ? 'See my matches' : 'Next';
+  btnBack.disabled = currentQ === 0;
+}
+
+function goNext() {
+  if (answers[currentQ] === undefined) return;
+  if (currentQ === TOTAL - 1) {
+    buildResults();
+    showScreen('results');
+    document.getElementById('sticky-hd').style.display = 'none';
+    return;
+  }
+  const nextFq = FLAT[currentQ + 1];
+  currentQ++;
+  if (nextFq.isFirst) {
+    showCatIntro(nextFq.catIndex);
+  } else {
+    showQuestion(currentQ, 'fwd');
+  }
+}
+
+function goBack() {
+  if (currentQ === 0) return;
+  currentQ--;
+  showQuestion(currentQ, 'back');
+}
+
+function retake() {
+  answers = {};
+  currentQ = 0;
+  document.getElementById('sticky-hd').style.display = 'none';
+  showScreen('cover');
+}
+
+// ════════════════════════════════════════════════
+// RESULTS
+// ════════════════════════════════════════════════
+function buildResults() {
+  const scored = COUNTRIES.map(c => {
+    let score = 0;
+    Object.values(answers).forEach(v => { if (v && c.scores[v]) score += c.scores[v]; });
+    return { ...c, score };
+  }).sort((a,b) => b.score - a.score);
+
+  const top3 = scored.slice(0, 3);
+
+  // personalised intro
+  const envMap = { beach:'coastal life and sea air', city:'city energy and urban rhythm', mountain:'nature, space and a slower pace', culture_rich:'warmth, culture and a life lived outside', mix:'variety and access to different environments' };
+  const budMap = { budget:'the need to make your money stretch', mid:'a comfortable mid-range approach', quality:'a willingness to invest in quality of life' };
+  const stageMap = { dreaming:'you are still in the dreaming stage', planning:'you are actively planning this move', ready:'you are almost ready and just need direction', going:'you have already decided and just need to know where' };
+  const env = envMap[answers[4]] || 'your environment needs';
+  const bud = budMap[answers[10]] || 'your financial situation';
+  const stage = stageMap[answers[24]] || 'wherever you are right now';
+
+  document.getElementById('result-intro-text').textContent =
+    `These are your top three countries, matched to your draw toward ${env}, ${bud}, and the fact that ${stage}. These are not random suggestions. They are the places most aligned with how you actually want to live.`;
+
+  document.getElementById('results-sub').textContent = 'Your top ' + top3.length + ' countries, ranked.';
+
+  const list = document.getElementById('country-list');
+  list.innerHTML = '';
+
+  const headClasses = ['r1','r2','r3'];
+  const whys = [
+    `This is your strongest match. It scores well across all five areas you answered: vibes, scale, budget, culture, and lifestyle. When your priorities point this clearly in one direction, it is worth taking seriously.`,
+    `A close second. The fit is strong, especially around the environment you described and the kind of daily life you want. Some trade-offs exist, but nothing that works against what you are building.`,
+    `Worth keeping on your list. This one matches several of your priorities strongly and may surprise you once you actually research it. The third match is often the one people end up choosing.`,
+  ];
+
+  top3.forEach((c, i) => {
+    const nbhds = (NEIGHBORHOODS[c.name] || []).map(n =>
+      `<div class="nbhd-item"><div class="nbhd-name">${n.name}</div><div class="nbhd-vibe">${n.vibe}</div></div>`
+    ).join('');
+
+    list.innerHTML += `
+      <div class="c-card${i===0?' top':''}">
+        <div class="c-head ${headClasses[i]}">
+          <span class="c-flag">${c.flag}</span>
+          <span class="c-name">${c.name}</span>
+          <span class="c-rank">${i+1}</span>
+        </div>
+        <div class="c-body">
+          <div>
+            <div class="c-lbl">Why this matches you</div>
+            <div class="c-why">${whys[i]}</div>
+          </div>
+          <div class="tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+          <div class="nbhd-section">
+            <div class="nbhd-lbl">Neighborhoods worth knowing</div>
+            ${nbhds}
+          </div>
+        </div>
+      </div>`;
+  });
+
+  window.scrollTo(0,0);
+}
+
+// ════════════════════════════════════════════════
+// DOWNLOAD RESULTS
+// ════════════════════════════════════════════════
+function downloadResults() {
+  const scored = COUNTRIES.map(c => {
+    let score = 0;
+    Object.values(answers).forEach(v => { if (v && c.scores[v]) score += c.scores[v]; });
+    return { ...c, score };
+  }).sort((a,b) => b.score - a.score);
+  const top3 = scored.slice(0,3);
+
+  const whys = [
+    "This is your strongest match. It scores well across all five areas: vibes, scale, budget, culture, and lifestyle.",
+    "A close second. The fit is strong, especially around the environment you described and the kind of daily life you want.",
+    "Worth keeping on your list. This one matches several of your priorities strongly and may surprise you once you research it."
+  ];
+
+  let txt = "════════════════════════════════════\n";
+  txt += "  THE 'FIND YOUR COUNTRY' QUIZ\n";
+  txt += "  by Kairos Destinara · Creativa Mari\n";
+  txt += "════════════════════════════════════\n\n";
+  txt += "YOUR TOP 3 COUNTRY MATCHES\n";
+  txt += "Generated: " + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}) + "\n\n";
+
+  top3.forEach((c, i) => {
+    txt += "──────────────────────────────────\n";
+    txt += `MATCH #${i+1}: ${c.name} ${c.flag}\n`;
+    txt += "──────────────────────────────────\n";
+    txt += whys[i] + "\n\n";
+    txt += "Tags: " + c.tags.join(', ') + "\n\n";
+    const nbhds = NEIGHBORHOODS[c.name] || [];
+    if (nbhds.length) {
+      txt += "Neighborhoods worth knowing:\n";
+      nbhds.forEach(n => {
+        txt += `  · ${n.name}\n`;
+        txt += `    ${n.vibe}\n`;
+      });
+    }
+    txt += "\n";
+  });
+
+  txt += "════════════════════════════════════\n";
+  txt += "This quiz is part of the Kairos Destinara\n";
+  txt += "Moving Abroad Bundle. The next steps are\n";
+  txt += "already waiting for you inside.\n";
+  txt += "════════════════════════════════════\n";
+
+  const blob = new Blob([txt], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kairos-destinara-country-matches.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// init
+showScreen('cover');
+</script>
+</body>
+</html>
