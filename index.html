@@ -9,10 +9,56 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-size:16px}
-body{font-family:'Abhaya Libre',Georgia,serif;background:#FAFAF8;color:#4A4A4A;min-height:100vh;overflow-x:hidden}
+body{font-family:'Abhaya Libre',Georgia,serif;background:#4A7A65;color:#4A4A4A;min-height:100vh;overflow-x:hidden}
 
-/* ── SHELL ── */
-.shell{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#FAFAF8;position:relative}
+/* ── SHELL: mobile = full width column, desktop = centered card ── */
+.shell{
+  width:100%;
+  max-width:520px;
+  margin:0 auto;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:#FAFAF8;
+  position:relative;
+}
+
+@media(min-width:860px){
+  body{
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:40px 24px 60px;
+    background:#4A7A65;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(139,168,154,0.35) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(200,169,126,0.12) 0%, transparent 50%);
+  }
+  .shell{
+    max-width:680px;
+    min-height:auto;
+    border-radius:0;
+    box-shadow:0 32px 80px rgba(0,0,0,0.28), 0 8px 24px rgba(0,0,0,0.18);
+  }
+  /* slightly more breathing room on wider screens */
+  .cover-hero{padding:44px 48px 36px}
+  .cover-white{padding:20px 48px 18px}
+  .cover-cta{padding:22px 48px 32px}
+  .ph{padding:18px 40px 14px}
+  .pbsc{padding:16px 40px 16px}
+  .q-foot{padding:13px 40px}
+  .cat-intro{padding:48px 48px 36px}
+  .cat-cta-wrap{padding:20px 48px 26px}
+  .results-hero{padding:36px 48px 28px}
+  .results-body{padding:20px 40px 28px}
+  .sticky-hd{padding:13px 40px 0}
+  .cover-title{font-size:46px}
+  .cat-name{font-size:42px}
+  .results-title{font-size:44px}
+  .cover-desc{max-width:400px}
+  .cat-desc{max-width:400px}
+  .results-sub{max-width:420px}
+}
 
 /* ── STICKY HEADER ── */
 .sticky-hd{position:sticky;top:0;z-index:100;background:#2C2C2C;padding:11px 22px 0;flex-shrink:0}
@@ -150,12 +196,13 @@ body{font-family:'Abhaya Libre',Georgia,serif;background:#FAFAF8;color:#4A4A4A;m
 .closing{background:#FFFFFF;padding:14px 28px 18px;text-align:center;flex-shrink:0}
 .closing-text{font-family:'Abhaya Libre',serif;font-style:italic;font-size:13px;color:#bb9c9e;line-height:1.65}
 
-@media(max-width:520px){
+@media(max-width:480px){
   .pbsc{padding:11px 16px 11px}
   .ph{padding:11px 18px 9px}
   .cover-hero{padding:24px 20px 20px;gap:10px}
   .results-body{padding:12px 16px 18px}
   .c-body,.results-hero{padding:14px 16px}
+  .cover-title{font-size:32px}
 }
 </style>
 </head>
